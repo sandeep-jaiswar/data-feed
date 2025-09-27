@@ -112,13 +112,6 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
         case_sensitive = False
         use_enum_values = True
-    
-    class Config:
-        """Pydantic configuration."""
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
-        use_enum_values = True
 
 
 @lru_cache()
