@@ -1,0 +1,107 @@
+# Production environment configuration
+# This file contains production-specific settings
+
+app:
+  name: "NSE Data ETL - Production"
+  version: "0.1.0"
+  environment: "production"
+  debug: false
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8080
+  workers: 4  # Adjust based on server capacity
+  reload: false
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"  # Structured logging for production
+  file: "/app/logs/nse-etl.log"
+
+# Database Configuration
+database:
+  clickhouse:
+    host: "clickhouse-cluster.internal"
+    port: 9000
+    database: "nse_data_prod"
+    user: "nse_user"
+    # Password MUST be set via environment variable CLICKHOUSE_PASSWORD
+    
+  redis:
+    host: "redis-cluster.internal"
+    port: 6379
+    db: 0
+    # Password MUST be set via environment variable REDIS_PASSWORD
+
+# Monitoring Configuration
+monitoring:
+  prometheus:
+    host: "prometheus.internal"
+    port: 9090
+  metrics_port: 8000
+  health_check_interval: 30
+  # Alert webhook URL MUST be set via environment variable ALERT_WEBHOOK_URL
+
+# Data Collection Configuration
+collector:
+  nse:
+    base_url: "https://www.nseindia.com"
+    timeout: 30
+    rate_limit: 500  # Higher rate limit for production
+    
+  websocket:
+    # WebSocket URL MUST be set via environment variable WEBSOCKET_URL
+    reconnect_interval: 5
+    
+  intervals:
+    equity_data: 1      # seconds
+    derivatives_data: 1 # seconds
+    indices_data: 5     # seconds
+
+# Performance Configuration
+performance:
+  max_workers: 8        # Higher for production
+  batch_size: 5000      # Larger batches for production
+  queue_size: 50000     # Larger queue for production
+
+# Security Configuration
+security:
+  # Allowed hosts MUST be restricted in production
+  allowed_hosts:
+    - "api.nse-data-etl.com"
+    - "nse-etl.internal"
+  cors_origins:
+    - "https://dashboard.nse-data-etl.com"
+
+# Feature Flags
+features:
+  enable_websocket: true
+  enable_technical_indicators: true
+  enable_real_time_processing: true
+  enable_data_validation: true
+  enable_performance_monitoring: true
+
+# Production-specific settings
+production:
+  # Connection pooling
+  connection_pool_size: 20
+  max_overflow: 30
+  
+  # Retry configuration
+  max_retries: 3
+  retry_backoff: 2.0
+  
+  # Circuit breaker settings
+  failure_threshold: 5
+  recovery_timeout: 60
+  
+  # Data retention
+  data_retention_days: 365
+  log_retention_days: 30
+  
+  # Backup configuration
+  backup_enabled: true
+  backup_interval_hours: 6
+  backup_retention_days: 30

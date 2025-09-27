@@ -1,0 +1,268 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nse-data-etl"
+version = "0.1.0"
+description = "High-performance NSE financial data ETL system with investment banking standards"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "NSE Data ETL Team", email = "team@nse-data-etl.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+requires-python = ">=3.9"
+dependencies = [
+    # Core async framework
+    "aiohttp>=3.8.0",
+    "aiofiles>=23.0.0",
+    "asyncio-throttle>=1.0.2",
+    
+    # Data processing and analysis
+    "pandas>=1.5.0",
+    "numpy>=1.24.0",
+    "polars>=0.19.0",  # High-performance DataFrame library
+    
+    # Database connectivity
+    "clickhouse-driver>=0.2.6",
+    "clickhouse-connect>=0.6.0",
+    "redis>=4.5.0",
+    "aioredis>=2.0.0",
+    
+    # Configuration and settings
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    
+    # Logging and monitoring
+    "loguru>=0.7.0",
+    "prometheus-client>=0.17.0",
+    "psutil>=5.9.0",
+    
+    # HTTP and WebSocket clients
+    "httpx>=0.24.0",
+    "websockets>=11.0.0",
+    "aiohttp-session>=2.12.0",
+    
+    # Data validation and serialization
+    "marshmallow>=3.19.0",
+    "jsonschema>=4.17.0",
+    
+    # Utilities
+    "typer>=0.9.0",  # CLI framework
+    "rich>=13.0.0",  # Rich terminal output
+    "python-dateutil>=2.8.0",
+    "pytz>=2023.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Code quality and formatting
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "flake8-docstrings>=1.7.0",
+    "flake8-type-checking>=2.4.0",
+    "flake8-bandit>=4.1.0",
+    
+    # Type checking
+    "mypy>=1.5.0",
+    "types-redis>=4.5.0",
+    "types-python-dateutil>=2.8.0",
+    "types-pytz>=2023.3.0",
+    
+    # Testing
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "pytest-xdist>=3.3.0",  # Parallel testing
+    "pytest-benchmark>=4.0.0",  # Performance testing
+    "factory-boy>=3.3.0",  # Test fixtures
+    "freezegun>=1.2.0",  # Time mocking
+    
+    # Security scanning
+    "bandit>=1.7.0",
+    "safety>=2.3.0",
+    
+    # Documentation
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    
+    # Development tools
+    "pre-commit>=3.3.0",
+    "tox>=4.6.0",
+    "invoke>=2.2.0",  # Task automation
+]
+
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0", 
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "pytest-xdist>=3.3.0",
+    "pytest-benchmark>=4.0.0",
+    "factory-boy>=3.3.0",
+    "freezegun>=1.2.0",
+]
+
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sandeep-jaiswar/data-feed"
+Repository = "https://github.com/sandeep-jaiswar/data-feed"
+Issues = "https://github.com/sandeep-jaiswar/data-feed/issues"
+Documentation = "https://github.com/sandeep-jaiswar/data-feed/docs"
+
+[project.scripts]
+nse-etl = "nse_etl.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nse_etl"]
+
+[tool.hatch.version]
+path = "src/nse_etl/__init__.py"
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # Directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["src", "tests"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "clickhouse_driver.*",
+    "clickhouse_connect.*",
+    "prometheus_client.*",
+    "factory_boy.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests", 
+    "performance: marks tests as performance tests",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Bandit security linter configuration
+[tool.bandit]
+exclude_dirs = ["tests", "scripts"]
+skips = ["B101", "B601"]  # Skip assert_used and shell=True checks
+
+# Flake8 configuration (in setup.cfg format for compatibility)
+[tool.flake8]
+max-line-length = 88
+extend-ignore = [
+    "E203",  # Whitespace before ':'
+    "E501",  # Line too long (handled by black)
+    "W503",  # Line break before binary operator
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".tox",
+    ".venv",
+]
+per-file-ignores = [
+    "__init__.py:F401",  # Imported but unused
+    "tests/*:S101",      # Use of assert detected
+]
