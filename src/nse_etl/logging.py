@@ -71,7 +71,7 @@ def setup_logging(settings: Optional[Settings] = None) -> None:
         extra={
             "service": settings.app_name,
             "version": settings.app_version,
-            "environment": settings.environment.value,
+            "environment": str(settings.environment),
         }
     )
     
@@ -80,7 +80,7 @@ def setup_logging(settings: Optional[Settings] = None) -> None:
         "Logging configured",
         level=settings.log_level,
         format=settings.log_format,
-        environment=settings.environment.value,
+        environment=str(settings.environment),
         debug=settings.debug,
     )
 
@@ -97,8 +97,7 @@ def _get_json_format() -> str:
         '"module": "{module}", '
         '"function": "{function}", '
         '"line": {line}, '
-        '"message": "{message}", '
-        '"extra": {extra}'
+        '"message": "{message}"'
         "}"
     )
 

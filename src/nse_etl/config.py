@@ -10,7 +10,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional, List
 
-from pydantic import BaseSettings, Field, validator
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Environment(str, Enum):
@@ -23,51 +24,51 @@ class Environment(str, Enum):
 class DatabaseSettings(BaseSettings):
     """Database configuration settings."""
     
-    # ClickHouse settings
-    clickhouse_host: str = Field(default="localhost", env="CLICKHOUSE_HOST")
-    clickhouse_port: int = Field(default=9000, env="CLICKHOUSE_PORT")
-    clickhouse_database: str = Field(default="nse_data", env="CLICKHOUSE_DATABASE")
-    clickhouse_user: str = Field(default="default", env="CLICKHOUSE_USER")
-    clickhouse_password: str = Field(default="", env="CLICKHOUSE_PASSWORD")
+    # Database settings
+    clickhouse_host: str = Field(default="localhost", description="ClickHouse host")
+    clickhouse_port: int = Field(default=9000, description="ClickHouse port")
+    clickhouse_database: str = Field(default="nse_data", description="ClickHouse database")
+    clickhouse_user: str = Field(default="default", description="ClickHouse user")
+    clickhouse_password: str = Field(default="", description="ClickHouse password")
     
     # Redis settings
-    redis_host: str = Field(default="localhost", env="REDIS_HOST")
-    redis_port: int = Field(default=6379, env="REDIS_PORT")
-    redis_db: int = Field(default=0, env="REDIS_DB")
-    redis_password: Optional[str] = Field(default=None, env="REDIS_PASSWORD")
+    redis_host: str = Field(default="localhost", description="Redis host")
+    redis_port: int = Field(default=6379, description="Redis port")
+    redis_db: int = Field(default=0, description="Redis database")
+    redis_password: Optional[str] = Field(default=None, description="Redis password")
 
 
 class MonitoringSettings(BaseSettings):
     """Monitoring and observability settings."""
     
     # Prometheus settings
-    prometheus_host: str = Field(default="localhost", env="PROMETHEUS_HOST")
-    prometheus_port: int = Field(default=9090, env="PROMETHEUS_PORT")
+    prometheus_host: str = Field(default="localhost", description="Prometheus host")
+    prometheus_port: int = Field(default=9090, description="Prometheus port")
     
     # Metrics settings
-    metrics_port: int = Field(default=8000, env="METRICS_PORT")
-    health_check_interval: int = Field(default=30, env="HEALTH_CHECK_INTERVAL")
+    metrics_port: int = Field(default=8000, description="Metrics port")
+    health_check_interval: int = Field(default=30, description="Health check interval")
     
     # Alerting
-    alert_webhook_url: Optional[str] = Field(default=None, env="ALERT_WEBHOOK_URL")
+    alert_webhook_url: Optional[str] = Field(default=None, description="Alert webhook URL")
 
 
 class CollectorSettings(BaseSettings):
     """Data collector configuration."""
     
     # NSE API settings
-    nse_base_url: str = Field(default="https://www.nseindia.com", env="NSE_BASE_URL")
-    nse_api_timeout: int = Field(default=30, env="NSE_API_TIMEOUT")
-    nse_rate_limit: int = Field(default=100, env="NSE_RATE_LIMIT")  # requests per minute
+    nse_base_url: str = Field(default="https://www.nseindia.com", description="NSE base URL")
+    nse_api_timeout: int = Field(default=30, description="NSE API timeout")
+    nse_rate_limit: int = Field(default=100, description="NSE rate limit")  # requests per minute
     
     # WebSocket settings
-    websocket_url: Optional[str] = Field(default=None, env="WEBSOCKET_URL")
-    websocket_reconnect_interval: int = Field(default=5, env="WEBSOCKET_RECONNECT_INTERVAL")
+    websocket_url: Optional[str] = Field(default=None, description="WebSocket URL")
+    websocket_reconnect_interval: int = Field(default=5, description="WebSocket reconnect interval")
     
     # Data collection intervals (seconds)
-    equity_data_interval: int = Field(default=1, env="EQUITY_DATA_INTERVAL")
-    derivatives_data_interval: int = Field(default=1, env="DERIVATIVES_DATA_INTERVAL")
-    indices_data_interval: int = Field(default=5, env="INDICES_DATA_INTERVAL")
+    equity_data_interval: int = Field(default=1, description="Equity data interval")
+    derivatives_data_interval: int = Field(default=1, description="Derivatives data interval")
+    indices_data_interval: int = Field(default=5, description="Indices data interval")
 
 
 class Settings(BaseSettings):
@@ -104,20 +105,13 @@ class Settings(BaseSettings):
     monitoring: MonitoringSettings = MonitoringSettings()
     collector: CollectorSettings = CollectorSettings()
     
-    @validator("log_level")
-    def validate_log_level(cls, v):
-        """Validate log level."""
-        valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-        if v.upper() not in valid_levels:
-            raise ValueError(f"Log level must be one of: {valid_levels}")
-        return v.upper()
     
-    @validator("environment")
-    def validate_environment(cls, v):
-        """Validate environment."""
-        if isinstance(v, str):
-            return Environment(v.lower())
-        return v
+    class Config:
+        """Pydantic configuration."""
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = False
+        use_enum_values = True
     
     class Config:
         """Pydantic configuration."""
